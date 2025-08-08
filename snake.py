@@ -32,9 +32,6 @@ snake_body = [[100, 60], [80, 60]]
 direction = 'RIGHT'
 change_to = direction
 
-# 畫面渲染
-screen.fill(BLACK)
-
 while True:
   
   # 這幾行註解掉看看
@@ -68,9 +65,11 @@ while True:
   if direction == 'RIGHT':
       snake_pos[0] += BLOCK_SIZE
 
+  # 畫面渲染
+  screen.fill(BLACK)
+
   # 蛇身體移動機制
   # print(f"list(snake_pos) = {list(snake_pos)}")
-
   snake_body.insert(0, list(snake_pos)) # 將新蛇頭位置插入蛇身體列表
   snake_body.pop() # 移除蛇尾
 
