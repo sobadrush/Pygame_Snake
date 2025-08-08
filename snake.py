@@ -3,6 +3,14 @@ import sys
 import time
 import random
 
+# 生成食物
+def generate_food(snake_body):
+    while True:
+        pos = [random.randrange(0, screen_width // BLOCK_SIZE) * BLOCK_SIZE, 
+               random.randrange(0, screen_height // BLOCK_SIZE) * BLOCK_SIZE]
+        if pos not in snake_body:
+            return pos
+
 # 初始化 Pygame
 pygame.init()
 
@@ -24,13 +32,16 @@ RED = pygame.Color(255, 0, 0)
 GREEN = pygame.Color(0, 255, 0)
 
 clock = pygame.time.Clock()
-snake_speed = 15
+snake_speed = 5 # 越大越快
 
 # 遊戲變數
 snake_pos = [100, 60]
 snake_body = [[100, 60], [80, 60]]
 direction = 'RIGHT'
 change_to = direction
+
+food_pos = generate_food(snake_body)
+
 
 while True:
   
@@ -71,11 +82,18 @@ while True:
   # 蛇身體移動機制
   # print(f"list(snake_pos) = {list(snake_pos)}")
   snake_body.insert(0, list(snake_pos)) # 將新蛇頭位置插入蛇身體列表
-  snake_body.pop() # 移除蛇尾
+  
+  if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
+      food_pos = generate_food(snake_body)
+  else:
+      snake_body.pop() # 移除蛇尾
 
   for pos in snake_body:
     # pygame.Rect(left, top, width, height)
     pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
     
+  # 繪製食物
+  pygame.draw.circle(screen, RED, (food_pos[0] + BLOCK_SIZE // 2, food_pos[1] + BLOCK_SIZE // 2), BLOCK_SIZE // 2)
+
   pygame.display.update()
   clock.tick(snake_speed)
