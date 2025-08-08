@@ -28,7 +28,7 @@ snake_speed = 15
 
 # 遊戲變數
 snake_pos = [100, 60]
-snake_body = [[100, 60], [80, 60], [60, 60]]
+snake_body = [[100, 60], [80, 60]]
 direction = 'RIGHT'
 change_to = direction
 
@@ -39,10 +39,13 @@ while True:
     if event.type == pygame.QUIT:
       pygame.quit()
       sys.exit()
-      
-    # 遊戲邏輯更新 (暫時為空)
-    
+
   # 畫面渲染
   screen.fill(BLACK)
+
+  # 遊戲邏輯更新 (暫時為空)
+  for pos in snake_body:
+    # pygame.Rect(left, top, width, height)
+    pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
   pygame.display.update()
   clock.tick(snake_speed)
