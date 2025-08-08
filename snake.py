@@ -55,8 +55,25 @@ while True:
             change_to = 'RIGHT'
 
   # 遊戲邏輯更新 (暫時為空)
+  # 防止180度轉彎
+  direction = change_to
 
-  
+  # 更新蛇頭位置
+  if direction == 'UP':
+      snake_pos[1] -= BLOCK_SIZE
+  if direction == 'DOWN':
+      snake_pos[1] += BLOCK_SIZE
+  if direction == 'LEFT':
+      snake_pos[0] -= BLOCK_SIZE
+  if direction == 'RIGHT':
+      snake_pos[0] += BLOCK_SIZE
+
+  # 蛇身體移動機制
+  # print(f"list(snake_pos) = {list(snake_pos)}")
+
+  snake_body.insert(0, list(snake_pos)) # 將新蛇頭位置插入蛇身體列表
+  snake_body.pop() # 移除蛇尾
+
   for pos in snake_body:
     # pygame.Rect(left, top, width, height)
     pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
