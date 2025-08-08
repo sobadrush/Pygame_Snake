@@ -32,6 +32,9 @@ snake_body = [[100, 60], [80, 60]]
 direction = 'RIGHT'
 change_to = direction
 
+# 畫面渲染
+screen.fill(BLACK)
+
 while True:
   
   # 這幾行註解掉看看
@@ -39,13 +42,24 @@ while True:
     if event.type == pygame.QUIT:
       pygame.quit()
       sys.exit()
-
-  # 畫面渲染
-  screen.fill(BLACK)
+    
+    # 鍵盤輸入
+    if event.type == pygame.KEYDOWN:
+        if (event.key == pygame.K_UP or event.key == ord('w')) and direction != 'DOWN':
+            change_to = 'UP'
+        if (event.key == pygame.K_DOWN or event.key == ord('s')) and direction != 'UP':
+            change_to = 'DOWN'
+        if (event.key == pygame.K_LEFT or event.key == ord('a')) and direction != 'RIGHT':
+            change_to = 'LEFT'
+        if (event.key == pygame.K_RIGHT or event.key == ord('d')) and direction != 'LEFT':
+            change_to = 'RIGHT'
 
   # 遊戲邏輯更新 (暫時為空)
+
+  
   for pos in snake_body:
     # pygame.Rect(left, top, width, height)
     pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
+    
   pygame.display.update()
   clock.tick(snake_speed)
