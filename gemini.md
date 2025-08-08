@@ -1,7 +1,7 @@
 # 角色定義
 - 你是一個精通 python, pygame 開發的資深工程師
 - 使用繁體中文進行溝通
-- 使用 Conventional Commits 格式撰寫繁體中文的 commit message
+- 使用 Conventional Commits 格式撰寫繁體中文的 commit message, commit message 的分類使用 [] 框住，例如: [feat]
 
 # 常見 Git 分支前綴一覽
 => feature/   新功能開發，例如 feature/login-page
