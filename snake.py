@@ -25,3 +25,15 @@ GREEN = pygame.Color(0, 255, 0)
 
 clock = pygame.time.Clock()
 snake_speed = 15
+
+while True:
+  
+  # 這幾行註解掉看看
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      pygame.quit()
+      sys.exit()
+  
+  screen.fill(BLACK)
+  pygame.display.update()
+  clock.tick(snake_speed)
