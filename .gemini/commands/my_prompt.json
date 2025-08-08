@@ -1,0 +1,5 @@
+{
+  "name": "cmsg",
+  "description": "產生 commit message",
+  "prompt": "根據目前的修改，使用 Conventional Commits 格式撰寫繁體中文的 commit message，你要 commit 之前，問過我"
+}
