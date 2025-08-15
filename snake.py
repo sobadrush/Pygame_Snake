@@ -3,6 +3,14 @@ import sys
 import time
 import random
 
+# 顯示分數
+def show_score(score):
+    score_font = pygame.font.SysFont('consolas', 20)
+    score_surface = score_font.render('Score : ' + str(score), True, WHITE)
+    score_rect = score_surface.get_rect()
+    score_rect.midtop = (screen_width / 10, 15)
+    screen.blit(score_surface, score_rect)
+
 # 生成食物
 def generate_food(snake_body):
     while True:
@@ -40,8 +48,11 @@ snake_body = [[100, 60], [80, 60]]
 direction = 'RIGHT'
 change_to = direction
 
+# 食物位置
 food_pos = generate_food(snake_body)
 
+# 分數
+score = 0
 
 while True:
   
@@ -95,5 +106,6 @@ while True:
   # 繪製食物
   pygame.draw.circle(screen, RED, (food_pos[0] + BLOCK_SIZE // 2, food_pos[1] + BLOCK_SIZE // 2), BLOCK_SIZE // 2)
 
+  show_score(score)
   pygame.display.update()
   clock.tick(snake_speed)
