@@ -94,7 +94,9 @@ while True:
   # print(f"list(snake_pos) = {list(snake_pos)}")
   snake_body.insert(0, list(snake_pos)) # 將新蛇頭位置插入蛇身體列表
   
+  # 碰撞與成長
   if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
+      score += 10 # 吃到食物，分數增加
       food_pos = generate_food(snake_body)
   else:
       snake_body.pop() # 移除蛇尾
