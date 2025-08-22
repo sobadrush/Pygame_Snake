@@ -4,8 +4,6 @@ import time
 import random
 
 # 顯示分數
-
-
 def show_score(score):
     score_font = pygame.font.SysFont('consolas', 20)
     score_surface = score_font.render('Score : ' + str(score), True, WHITE)
@@ -14,8 +12,6 @@ def show_score(score):
     screen.blit(score_surface, score_rect)
 
 # 生成食物
-
-
 def generate_food(snake_body):
     while True:
         pos = [random.randrange(0, screen_width // BLOCK_SIZE) * BLOCK_SIZE,
@@ -24,8 +20,6 @@ def generate_food(snake_body):
             return pos
 
 # Game Over 訊息
-
-
 def game_over_message(score):
     my_font = pygame.font.SysFont('times new roman', 90)
     game_over_surface = my_font.render('YOU DIED', True, RED)
