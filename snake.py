@@ -114,9 +114,16 @@ def main():
             pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
         pygame.draw.rect(screen, RED, pygame.Rect(food_pos[0], food_pos[1], BLOCK_SIZE, BLOCK_SIZE))
         
-        if snake_pos[0] < 0 or snake_pos[0] >= screen_width or snake_pos[1] < 0 or snake_pos[1] >= screen_height:
-            game_over_message(score)
-            main()
+        # 若接觸邊界則從另一側出現
+        if snake_pos[0] >= screen_width:
+            snake_pos[0] = 0
+        elif snake_pos[0] < 0:
+            snake_pos[0] = screen_width - BLOCK_SIZE
+        if snake_pos[1] >= screen_height:
+            snake_pos[1] = 0
+        elif snake_pos[1] < 0:
+            snake_pos[1] = screen_height - BLOCK_SIZE
+            
         for block in snake_body[1:]:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over_message(score)
