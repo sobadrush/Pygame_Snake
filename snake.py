@@ -39,7 +39,17 @@ def game_over_message(score):
     pygame.display.flip()
 
     time.sleep(2)  # 暫停兩秒
-    # 接下來要處理重新開始
+    
+    # 接下來要處理[重新開始]
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                waiting = False # 結束等待，返回 main 函式
+
 
 
 # 初始化 Pygame
