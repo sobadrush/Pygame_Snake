@@ -20,6 +20,7 @@ BLACK = pygame.Color(0, 0, 0)
 WHITE = pygame.Color(255, 255, 255)
 RED = pygame.Color(255, 0, 0)
 GREEN = pygame.Color(0, 255, 0)
+BLUE = pygame.Color(0, 0, 255)
 
 # FPS 控制器
 clock = pygame.time.Clock()
@@ -73,10 +74,20 @@ def main():
             if pos not in snake_body:
                 return pos
 
+    # 新增 generate_poison 函式
+    def generate_poison(snake_body, food_pos):
+        while True:
+            pos = [random.randrange(0, screen_width // BLOCK_SIZE) * BLOCK_SIZE, 
+                   random.randrange(0, screen_height // BLOCK_SIZE) * BLOCK_SIZE]
+            if (pos not in snake_body) and (pos != food_pos): # 確保不會產生在蛇身上，也不會跟食物重疊
+                return pos
+        
+
     score = 0
     snake_pos = [100, 60]
     snake_body = [[100, 60], [80, 60], [60, 60]]
     food_pos = generate_food(snake_body)
+    poison_pos = generate_poison(snake_body, food_pos) # 毒藥
     direction = 'RIGHT'
     change_to = direction
 
@@ -103,16 +114,24 @@ def main():
         if direction == 'RIGHT': snake_pos[0] += BLOCK_SIZE
 
         snake_body.insert(0, list(snake_pos))
-        if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]:
+        if snake_pos[0] == food_pos[0] and snake_pos[1] == food_pos[1]: # 吃到食物
             score += 10
             food_pos = generate_food(snake_body)
+        elif snake_pos[0] == poison_pos[0] and snake_pos[1] == poison_pos[1]: # 吃到毒藥
+            game_over_message(score)
+            break
         else:
             snake_body.pop()
 
         screen.fill(BLACK)
         for pos in snake_body:
             pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
+            
+        # 繪製食物
         pygame.draw.rect(screen, RED, pygame.Rect(food_pos[0], food_pos[1], BLOCK_SIZE, BLOCK_SIZE))
+        
+        # 繪製毒藥
+        pygame.draw.rect(screen, BLUE, pygame.Rect(poison_pos[0], poison_pos[1], BLOCK_SIZE, BLOCK_SIZE))
         
         # 若接觸邊界則從另一側出現
         if snake_pos[0] >= screen_width:
