@@ -16,16 +16,78 @@ class Config:
     RED = pygame.Color(255, 0, 0)
     GREEN = pygame.Color(0, 255, 0)
     BLUE = pygame.Color(0, 0, 255)
+    YELLOW = pygame.Color(255, 255, 0)
+    CYAN = pygame.Color(0, 255, 255)
+    MAGENTA = pygame.Color(255, 0, 255)
+    ORANGE = pygame.Color(255, 165, 0)
 
 
 class Snake:
     """貪食蛇類別"""
     
-    def __init__(self):
-        """初始化蛇的位置與身體"""
-        self.position = [100, 60]
-        self.body = [[100, 60], [80, 60], [60, 60]]
-        self.direction = 'RIGHT'
+    def __init__(self, is_auto_run=False, start_pos=None, color=None):
+        """
+        初始化蛇的位置與身體
+        
+        參數:
+            is_auto_run: 是否為 AI 自動控制
+            start_pos: 起始位置 [x, y]，若為 None 則使用隨機位置
+            color: 蛇的顏色，若為 None 則使用預設綠色
+        """
+        self.is_auto_run = is_auto_run
+        self.color = color or Config.GREEN
+        
+        # 決定起始位置
+        if start_pos is None:
+            # 隨機生成起始位置
+            x = random.randrange(3, (Config.SCREEN_WIDTH // Config.BLOCK_SIZE) - 3) * Config.BLOCK_SIZE
+            y = random.randrange(3, (Config.SCREEN_HEIGHT // Config.BLOCK_SIZE) - 3) * Config.BLOCK_SIZE
+            self.position = [x, y]
+        else:
+            self.position = list(start_pos)
+        
+        # 隨機選擇初始方向
+        self.direction = random.choice(['UP', 'DOWN', 'LEFT', 'RIGHT'])
+        
+        # 根據方向建立初始蛇身
+        self.body = [list(self.position)]
+        for i in range(1, 3):
+            if self.direction == 'RIGHT':
+                self.body.append([self.position[0] - i * Config.BLOCK_SIZE, self.position[1]])
+            elif self.direction == 'LEFT':
+                self.body.append([self.position[0] + i * Config.BLOCK_SIZE, self.position[1]])
+            elif self.direction == 'DOWN':
+                self.body.append([self.position[0], self.position[1] - i * Config.BLOCK_SIZE])
+            elif self.direction == 'UP':
+                self.body.append([self.position[0], self.position[1] + i * Config.BLOCK_SIZE])
+    
+    def auto_decide_direction(self, food_pos):
+        """
+        AI 自動決定移動方向（簡單邏輯：追蹤食物）
+        
+        參數:
+            food_pos: 食物位置 [x, y]
+        """
+        if not self.is_auto_run:
+            return
+        
+        # 計算與食物的距離
+        dx = food_pos[0] - self.position[0]
+        dy = food_pos[1] - self.position[1]
+        
+        # 優先選擇距離較遠的軸向移動
+        if abs(dx) > abs(dy):
+            # 橫向距離較遠
+            if dx > 0:
+                self.change_direction('RIGHT')
+            else:
+                self.change_direction('LEFT')
+        else:
+            # 縱向距離較遠
+            if dy > 0:
+                self.change_direction('DOWN')
+            else:
+                self.change_direction('UP')
     
     def change_direction(self, new_direction):
         """改變移動方向（防止反向移動）"""
@@ -64,7 +126,7 @@ class Snake:
     def draw(self, screen):
         """繪製蛇"""
         for segment in self.body:
-            pygame.draw.rect(screen, Config.GREEN, 
+            pygame.draw.rect(screen, self.color, 
                            pygame.Rect(segment[0], segment[1], 
                                      Config.BLOCK_SIZE, Config.BLOCK_SIZE))
 
@@ -107,14 +169,20 @@ class Game:
         self.clock = pygame.time.Clock()
         self.score = 0
         
-        # 建立遊戲物件
-        self.snake = Snake()
+        # 建立玩家控制的蛇（綠色）
+        self.snake = Snake(is_auto_run=False, start_pos=[100, 60], color=Config.GREEN)
+        
+        # 建立 AI 蛇（黃色），使用隨機起始位置
+        self.ai_snake = Snake(is_auto_run=True, start_pos=None, color=Config.YELLOW)
+        
+        # 建立食物和毒藥
         self.food = Food(Config.RED)
         self.poison = Food(Config.BLUE)
         
-        # 生成初始食物和毒藥
-        self.food.spawn(self.snake.body)
-        self.poison.spawn(self.snake.body, self.food.position)
+        # 生成初始食物和毒藥（避開所有蛇）
+        all_snake_bodies = self.snake.body + self.ai_snake.body + self.ai_snake2.body
+        self.food.spawn(all_snake_bodies)
+        self.poison.spawn(all_snake_bodies, self.food.position)
     
     def handle_input(self):
         """處理使用者輸入"""
@@ -135,22 +203,46 @@ class Game:
     
     def update(self):
         """更新遊戲狀態"""
-        self.snake.move()
+        # AI 蛇自動決定方向
+        self.ai_snake.auto_decide_direction(self.food.position)
         
-        # 檢查是否吃到食物
+        # 移動所有蛇
+        self.snake.move()
+        self.ai_snake.move()
+        
+        # 檢查玩家的蛇是否吃到食物
         if self.snake.position == self.food.position:
             self.score += 10
             self.snake.grow()
-            self.food.spawn(self.snake.body, self.poison.position)
-        # 檢查是否吃到毒藥
+            all_snake_bodies = self.snake.body + self.ai_snake.body
+            self.food.spawn(all_snake_bodies, self.poison.position)
+        # 檢查玩家的蛇是否吃到毒藥
         elif self.snake.position == self.poison.position:
             return False  # 遊戲結束
         else:
             self.snake.update_body()
         
-        # 檢查是否撞到自己
+        # 檢查 AI 蛇是否吃到食物
+        if self.ai_snake.position == self.food.position:
+            self.ai_snake.grow()
+            all_snake_bodies = self.snake.body + self.ai_snake.body
+            self.food.spawn(all_snake_bodies, self.poison.position)
+        # 檢查 AI 蛇是否吃到毒藥
+        elif self.ai_snake.position == self.poison.position:
+            # AI 蛇死亡後重生
+            self.ai_snake = Snake(is_auto_run=True, start_pos=None, color=Config.YELLOW)
+        else:
+            self.ai_snake.update_body()
+        
+        # 檢查玩家的蛇是否撞到自己或 AI 蛇
         if self.snake.check_self_collision():
             return False  # 遊戲結束
+        if self.snake.position in self.ai_snake.body:
+            return False  # 撞到 AI 蛇，遊戲結束
+        
+        # AI 蛇撞到自己則重生
+        if self.ai_snake.check_self_collision():
+            self.ai_snake = Snake(is_auto_run=True, start_pos=None, color=Config.YELLOW)
         
         return True  # 遊戲繼續
     
@@ -158,6 +250,7 @@ class Game:
         """繪製遊戲畫面"""
         self.screen.fill(Config.BLACK)
         self.snake.draw(self.screen)
+        self.ai_snake.draw(self.screen)  # 繪製 AI 蛇
         self.food.draw(self.screen)
         self.poison.draw(self.screen)
         self.show_score()
